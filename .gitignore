@@ -1,0 +1,88 @@
+# ===============================
+# NewsBrief AI - .gitignore
+# ===============================
+
+# ---- Secrets & Environment ----
+.env
+.env.*
+*.key
+*.pem
+config.yaml
+secrets.yaml
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ---- Virtual Environments ----
+venv/
+.venv/
+env/
+ENV/
+
+# ---- Jupyter / Experiments ----
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# ---- Logs & Runtime Files ----
+logs/
+*.log
+*.out
+*.err
+
+# ---- Data & Datasets ----
+data/
+datasets/
+raw_data/
+processed_data/
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+
+# ---- AI / ML Artifacts ----
+models/
+checkpoints/
+embeddings/
+faiss_index/
+*.index
+*.bin
+*.pt
+*.pth
+*.onnx
+
+# ---- Cache ----
+.cache/
+tmp/
+temp/
+
+# ---- Evaluation & Outputs ----
+outputs/
+results/
+reports/
+
+# ---- IDE & OS ----
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ---- Git ----
+*.orig
+
+# ---- Optional Frontend (if added later) ----
+node_modules/
+dist/
+build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
