@@ -1,3 +1,6 @@
+streamlit
 pandas
 regex
 python-dateutil
+transformers
+torch
