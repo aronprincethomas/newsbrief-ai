@@ -1,6 +1,7 @@
 streamlit
 pandas
-regex
+numpy
 python-dateutil
-transformers
+sentence-transformers
+faiss-cpu
 torch
