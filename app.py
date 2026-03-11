@@ -20,19 +20,17 @@ def load_engine():
 
 engine = load_engine()
 
-query = st.text_input(
-    "Enter your question",
-    placeholder="Example: What is happening with Brexit?"
-)
+# Chat input
+prompt = st.chat_input("Ask about news...")
 
-if st.button("Ask"):
-    if query:
-        with st.spinner("Generating answer..."):
-            answer = engine.ask(query)
+if prompt:
+    st.chat_message("user").write(prompt)
 
-        st.subheader("Summary")
-        st.write(answer)
+    with st.spinner("Thinking..."):
+        response = engine.ask(prompt)
 
-        # Expandable sources section
-        with st.expander("Sources"):
-            st.write("Relevant articles retrieved from dataset.")
+    st.chat_message("assistant").write(response)
+
+    # Expandable sources section
+    with st.expander("Sources"):
+        st.write("Relevant articles retrieved from dataset.")
