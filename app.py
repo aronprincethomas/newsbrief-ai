@@ -20,7 +20,10 @@ def load_engine():
 
 engine = load_engine()
 
-query = st.text_input("Enter your question")
+query = st.text_input(
+    "Enter your question",
+    placeholder="Example: What is happening with Brexit?"
+)
 
 if st.button("Ask"):
     if query:
@@ -29,3 +32,7 @@ if st.button("Ask"):
 
         st.subheader("Summary")
         st.write(answer)
+
+        # Expandable sources section
+        with st.expander("Sources"):
+            st.write("Relevant articles retrieved from dataset.")
