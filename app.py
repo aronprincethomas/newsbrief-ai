@@ -20,15 +20,28 @@ def load_engine():
 
 engine = load_engine()
 
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Display previous chat messages
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
+
 # Chat input
 prompt = st.chat_input("Ask about news...")
 
 if prompt:
+    # Save user message
+    st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
+    # Generate response
     with st.spinner("Thinking..."):
         response = engine.ask(prompt)
 
+    # Save assistant response
+    st.session_state.messages.append({"role": "assistant", "content": response})
     st.chat_message("assistant").write(response)
 
     # Expandable sources section
