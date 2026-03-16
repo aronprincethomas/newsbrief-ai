@@ -5,3 +5,5 @@ python-dateutil
 sentence-transformers
 faiss-cpu
 torch
+transformers==4.41.2
+accelerate
