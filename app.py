@@ -26,7 +26,15 @@ if "messages" not in st.session_state:
 
 # Display previous chat messages
 for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
+        if msg["role"] == "assistant" and msg.get("sources"):
+            with st.expander(f"Sources ({len(msg['sources'])} article{'s' if len(msg['sources']) != 1 else ''})"):
+                for src in msg["sources"]:
+                    st.markdown(f"**📰 {src['title']}**")
+                    st.caption(f"📁 {src['category']}  |  📅 {src['date']}")
+                    st.markdown(f"🔗 [{src['source_url']}]({src['source_url']})")
+                    st.divider()
 
 # Chat input
 prompt = st.chat_input("Ask about news...")
@@ -38,12 +46,26 @@ if prompt:
 
     # Generate response
     with st.spinner("Thinking..."):
-        response = engine.ask(prompt)
+        result = engine.ask(prompt)
 
-    # Save assistant response
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    st.chat_message("assistant").write(response)
+    summary = result["summary"]
+    sources = result["sources"]
 
-    # Expandable sources section
-    with st.expander("Sources"):
-        st.write("Relevant articles retrieved from dataset.")
+    # Save assistant response with sources
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": summary,
+        "sources": sources
+    })
+
+    with st.chat_message("assistant"):
+        st.write(summary)
+        with st.expander(f"Sources ({len(sources)} article{'s' if len(sources) != 1 else ''})"):
+            if sources:
+                for src in sources:
+                    st.markdown(f"**📰 {src['title']}**")
+                    st.caption(f"📁 {src['category']}  |  📅 {src['date']}")
+                    st.markdown(f"🔗 [{src['source_url']}]({src['source_url']})")
+                    st.divider()
+            else:
+                st.write("No sources found.")
