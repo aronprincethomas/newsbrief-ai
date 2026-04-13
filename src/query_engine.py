@@ -1,27 +1,56 @@
+from pathlib import Path
+
+import pandas as pd
+
 from src.data_loader import load_news_data
 from src.text_chunker import chunk_articles
 from src.embedding_generator import EmbeddingGenerator
 from src.vector_index import VectorIndex
 from src.summarizer import NewsSummarizer
+from src.cache_manager import (
+    cache_is_valid,
+    save_hash,
+    INDEX_PATH,
+    CHUNKS_PATH,
+    CACHE_DIR,
+)
 
 
 class QueryEngine:
 
     def __init__(self, data_path):
-
-        self.df = load_news_data(data_path)
-        self.chunked_df = chunk_articles(self.df)
-
+        data_path = Path(data_path)
         self.embedder = EmbeddingGenerator()
 
-        self.embeddings = self.embedder.generate_embeddings(
-            self.chunked_df["content"].tolist()
-        )
+        if cache_is_valid(data_path):
+            # ---- FAST PATH: load from disk ----
+            print("✅ Loading cached FAISS index...")
+            self.chunked_df = pd.read_parquet(CHUNKS_PATH)
+            embedding_dim = self.embedder.model.get_sentence_embedding_dimension()
+            self.index = VectorIndex(embedding_dim)
+            self.index.load(INDEX_PATH)
 
-        embedding_dim = self.embeddings.shape[1]
+        else:
+            # ---- SLOW PATH: build and cache ----
+            print("⚙️  Building index (first run or data changed)...")
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-        self.index = VectorIndex(embedding_dim)
-        self.index.add_embeddings(self.embeddings)
+            df = load_news_data(data_path)
+            self.chunked_df = chunk_articles(df)
+
+            embeddings = self.embedder.generate_embeddings(
+                self.chunked_df["content"].tolist()
+            )
+
+            self.index = VectorIndex(embeddings.shape[1])
+            self.index.add_embeddings(embeddings)
+
+            # Persist to disk
+            self.index.save(INDEX_PATH)
+            self.chunked_df.to_parquet(CHUNKS_PATH, index=False)
+            save_hash(data_path)
+
+            print("✅ Index cached. Future startups will be instant.")
 
         self.summarizer = NewsSummarizer()
 

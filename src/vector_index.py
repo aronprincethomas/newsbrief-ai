@@ -1,5 +1,6 @@
 import faiss
 import numpy as np
+from pathlib import Path
 
 
 class VectorIndex:
@@ -32,3 +33,11 @@ class VectorIndex:
         )
 
         return distances, indices
+
+    def save(self, path: Path):
+        """Persist the FAISS index to disk."""
+        faiss.write_index(self.index, str(path))
+
+    def load(self, path: Path):
+        """Load a previously saved FAISS index from disk."""
+        self.index = faiss.read_index(str(path))

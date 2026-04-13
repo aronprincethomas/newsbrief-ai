@@ -14,7 +14,7 @@ st.sidebar.write("Example queries:")
 st.sidebar.write("- What is happening with Brexit?")
 st.sidebar.write("- How to improve focus?")
 
-@st.cache_resource
+@st.cache_resource(show_spinner="🔍 Loading news index...")
 def load_engine():
     return QueryEngine("data/processed/news_clean.csv")
 
