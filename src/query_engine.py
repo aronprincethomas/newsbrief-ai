@@ -34,14 +34,28 @@ class QueryEngine:
         THRESHOLD = 1.2
 
         if distances[0][0] > THRESHOLD:
-            return "No relevant information found in dataset."
+            return {"summary": "No relevant information found in dataset.", "sources": []}
 
         chunk_summaries = []
+        seen_article_ids = set()
+        sources = []
 
         for i in indices[0]:
-            text = self.chunked_df.iloc[i]["content"]
+            row = self.chunked_df.iloc[i]
+            text = row["content"]
             summary = self.summarizer.summarize(text)
             chunk_summaries.append(summary)
+
+            article_id = row["article_id"]
+            if article_id not in seen_article_ids:
+                seen_article_ids.add(article_id)
+                date = row["date"]
+                sources.append({
+                    "title": row["title"],
+                    "source_url": row["source_url"],
+                    "category": row["category"],
+                    "date": date.strftime("%Y-%m-%d") if hasattr(date, "strftime") else str(date),
+                })
 
         combined_summary = " ".join(chunk_summaries)
 
@@ -51,4 +65,4 @@ class QueryEngine:
             min_length=40
         )
 
-        return final_summary
+        return {"summary": final_summary, "sources": sources}
